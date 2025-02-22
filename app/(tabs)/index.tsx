@@ -6,7 +6,7 @@ import { Text, View } from "@/components/Themed";
 export default function TabOneScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>TUFT NUTS YAY</Text>
+      <Text className="text-red-500">TUFT NUTS YAY</Text>
       <View
         style={styles.separator}
         lightColor="#eee"
