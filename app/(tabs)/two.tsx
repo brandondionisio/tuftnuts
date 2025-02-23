@@ -13,12 +13,16 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
+import { writePostData, getAllUsers } from "../../firebase";
 
 export default function TabTwo() {
   // PhotoLibraryPicker Component
   const PhotoLibraryPicker = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [location, setLocation] = useState<{
+      latitude: number;
+      longitude: number;
+    } | null>(null);
 
     const openImagePicker = async () => {
       // Request permission
@@ -32,7 +36,8 @@ export default function TabTwo() {
         return;
       }
 
-      const { status: mediaLibraryStatus } = await MediaLibrary.requestPermissionsAsync();
+      const { status: mediaLibraryStatus } =
+        await MediaLibrary.requestPermissionsAsync();
       if (mediaLibraryStatus !== "granted") {
         Alert.alert("Permission Denied", "Please enable media library access.");
         return;
@@ -46,7 +51,7 @@ export default function TabTwo() {
       });
 
       if (!result.canceled) {
-        const imageUri = result.assets[0].uri
+        const imageUri = result.assets[0].uri;
         console.log("Image URI:", imageUri);
         setSelectedImage(imageUri);
 
@@ -69,12 +74,12 @@ export default function TabTwo() {
             console.log("Image Location:", assetInfo.location);
           } else {
             console.log("No location data available.");
-          } 
+          }
         } catch (error) {
           console.error("Error retrieving asset info:", error);
         }
       }
-    }
+    };
 
     return (
       <View style={styles.centerContainer}>
@@ -133,14 +138,32 @@ export default function TabTwo() {
       }
 
       // Here you would typically write the data to your backend or Firebase.
-      Alert.alert("Success", "Your squirrel was posted!");
-      setFormData({ location: "", date: "", name: "", description: "" });
+      // Alert.alert("Success", "Your squirrel was posted!");
+      // setFormData({ location: "", date: "", name: "", description: "" });
     };
 
     return (
       <ScrollView contentContainerStyle={styles.formContainer}>
         <PhotoLibraryPicker />
         <View style={styles.inputRow}>
+          <Button
+            title="Test Write to Firebase"
+            onPress={() =>
+              writePostData(
+                "NuttyBuddy",
+                "He stole my lunch",
+                "Tisch Library",
+                42.4058,
+                -71.1152,
+                "DEMO_URL",
+                0
+              )
+            }
+          />
+          <Button
+            title="Test getting all users"
+            onPress={() => console.log(getAllUsers())}
+          />
           <Text style={styles.label}>Location: </Text>
           <TextInput
             style={styles.input}
