@@ -110,7 +110,7 @@ export default function NewPostForm() {
       selectedImage,
       0
     );
-   
+
     Alert.alert("Success", "Your squirrel was posted!");
     setFormData({ location: "", name: "", description: "" });
     setSelectedImage(null);

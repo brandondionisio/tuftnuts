@@ -31,7 +31,7 @@ type Post = {
   location: string;
   squirrelName: string;
   description: string;
-  nuts: number;
+  nut_count: number;
   liked?: boolean; // add a liked property
 };
 
@@ -40,7 +40,7 @@ interface SightingCardProps {
   location: string;
   name: string;
   description: string;
-  nuts: number;
+  nut_count: number;
   image: string;
   liked: boolean;
   onLike: () => void;
@@ -66,7 +66,7 @@ export default function HomeScreen() {
       try {
         const data = await getAllUsers();
         const squirrel_count = await getUserCount();
-        // console.log("DATA after fetch: ", data);
+        console.log("DATA after fetch: ", data);
         // If getAllUsers returns null, you can set it to an empty array.
         setPosts(data || []);
         setSquirrelCount(String(squirrel_count));
@@ -118,18 +118,21 @@ export default function HomeScreen() {
               location={post.location}
               name={post.squirrelName}
               description={post.description}
-              nuts={post.nuts}
+              nut_count={post.nut_count}
               liked={!!post.liked}
               onLike={() => {
                 const newPosts = [...posts];
                 if (newPosts[index].liked) {
                   // If already liked, remove the like
                   newPosts[index].liked = false;
-                  newPosts[index].nuts = Math.max(newPosts[index].nuts - 1, 0);
+                  newPosts[index].nut_count = Math.max(
+                    newPosts[index].nut_count - 1,
+                    0
+                  );
                 } else {
                   // Otherwise, add a like
                   newPosts[index].liked = true;
-                  newPosts[index].nuts++;
+                  newPosts[index].nut_count++;
                 }
                 setPosts(newPosts);
               }}
@@ -145,7 +148,7 @@ const SightingCard: React.FC<SightingCardProps> = ({
   time,
   location,
   description,
-  nuts,
+  nut_count,
   image,
   liked,
   name,
@@ -176,7 +179,7 @@ const SightingCard: React.FC<SightingCardProps> = ({
             {!liked && (
               <Image style={{ width: 24, height: 24 }} source={AcornIcon} />
             )}
-            <Text style={styles.likesText}>{nuts}</Text>
+            <Text style={styles.likesText}>{nut_count}</Text>
           </Pressable>
         </BlurView>
       </ImageBackground>

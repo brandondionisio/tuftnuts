@@ -92,7 +92,7 @@ async function getAllUsers() {
           location: userData.location || "",
           squirrelName: userData.squirrel_name || "",
           description: userData.description || "",
-          nuts: userData.nuts || 0,
+          nut_count: userData.nut_count || 0,
         };
       });
     //   console.log("All posts:", posts);
