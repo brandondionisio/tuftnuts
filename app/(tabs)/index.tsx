@@ -9,11 +9,14 @@ import {
   ScrollView,
   ImageBackground,
   Pressable,
+  SafeAreaView,
 } from "react-native";
 import { BlurView } from "expo-blur";
+import { useFonts } from 'expo-font';
 import { FontAwesome } from "@expo/vector-icons";
 const AcornIcon = require("../../assets/images/acorn.png");
 const SquirrelIcon = require("../../assets/images/white_squirrel.png");
+// const HeaderFont = require("../../assets/fonts/font1.ttf");
 
 const squirrelImage =
   "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallup.net%2Fwp-content%2Fuploads%2F2019%2F10%2F559985-squirrel-funny-humor.jpg&f=1&nofb=1&ipt=c6a6e896431605ae43c6772c0fb4ef4d635de2b2f6074ec82d36edcb17e55c65&ipo=images";
@@ -64,7 +67,7 @@ const starterPosts = [
     time: "12:19PM",
     location: "Eaton Hall",
     squirrelName: "Jeffery",
-    description: "A squirrel eatin' outside Eaton",
+    description: "This guy is eatin' outside Eaton",
     nuts: 59,
   },
 ];
@@ -72,55 +75,58 @@ const starterPosts = [
 export default function HomeScreen() {
   const [posts, setPosts] = useState<Post[]>(starterPosts);
 
+  const [fontsLoaded] = useFonts({
+    // 'Poppins-Bold': require('../../assets/fonts/'),
+    'Header-Font': require("../../assets/fonts/font3.ttf"),
+  });
+  if (!fontsLoaded) return null;
+
   useEffect(() => {
     console.log("re-rendering home screen");
   }, []);
 
   return (
-    <View style={styles.container}>
-      {/* <ImageBackground
-        source={LeavesBg}
-        resizeMode = "cover"
-        style={styles.bgImage}
-      /> */}
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>TuftNuts</Text>
-      </View>
+    <SafeAreaView style={styles.safeContainer}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerText}>TuftNuts</Text>
+        </View>
 
-      {/* Nut Count Section */}
-      <View style={styles.cardShadow}>
-        <View style={styles.nutCountContainer}>
-          <View style={styles.nutIcon}>
-            <Image style={{ width: 50, height: 50 }} source={SquirrelIcon} />
-            {/* <FontAwesome name="tree" size={28} color="black" /> */}
-          </View>
-          <View style={styles.nutTextContainer}>
-            <Text style={styles.nutLabel}>SQUIRRELS SPOTTED</Text>
-            <Text style={styles.nutCount}>428</Text>
+        {/* Nut Count Section */}
+        <View style={styles.cardShadow}>
+          <View style={styles.nutCountContainer}>
+            <View style={styles.nutIcon}>
+              <Image style={{ width: 50, height: 50 }} source={SquirrelIcon} />
+              {/* <FontAwesome name="tree" size={28} color="black" /> */}
+            </View>
+            <View style={styles.nutTextContainer}>
+              <Text style={styles.nutLabel}>SQUIRRELS SPOTTED</Text>
+              <Text style={styles.nutCount}>428</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Scrollable Squirrel Sightings */}
-      <ScrollView>
-        {posts.map((post, index) => (
-          <SightingCard
-            key={post.image}
-            image={post.image}
-            time={post.time}
-            location={post.location}
-            description={post.description}
-            nuts={post.nuts}
-            onLike={() => {
-              const newPosts = [...posts];
-              newPosts[index].nuts++;
-              setPosts(newPosts);
-            }}
-          />
-        ))}
-      </ScrollView>
-    </View>
+        {/* Scrollable Squirrel Sightings */}
+        <ScrollView>
+          {posts.map((post, index) => (
+            <SightingCard
+              key={post.image}
+              image={post.image}
+              time={post.time}
+              location={post.location}
+              description={post.description}
+              nuts={post.nuts}
+              onLike={() => {
+                const newPosts = [...posts];
+                newPosts[index].nuts++;
+                setPosts(newPosts);
+              }}
+            />
+          ))}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -167,20 +173,25 @@ const styles = StyleSheet.create({
   //   resizeMode: 'cover',
   //   justifyContent: 'center',
   // },
+  safeContainer: {
+    flex: 1,
+    backgroundColor: "#5c2c06",
+  },
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingTop: 50,
   },
   header: {
-    backgroundColor: "#8B4513",
-    padding: 15,
+    backgroundColor: "#5c2c06",
+    padding: 5,
     alignItems: "center",
   },
   headerText: {
-    fontSize: 28,
+    fontSize: 85,
     fontWeight: "bold",
     color: "white",
+    fontFamily: "Header-Font",
+    letterSpacing: 3,
   },
   nutCountContainer: {
     flexDirection: "row",
@@ -191,9 +202,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nutIcon: {
-    backgroundColor: "#8B4513",
+    backgroundColor: "#5c2c06",
     padding: 10,
     borderRadius: 50,
+    
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
   nutTextContainer: {
     flex: 1,
