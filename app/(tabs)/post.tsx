@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     // backgroundColor: "#fff",
-    backgroundColor: 'white',
+    backgroundColor: "white",
     paddingVertical: 20,
   },
   centerContainer: {
@@ -83,14 +83,14 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   squirrelImage: {
     width: 250,
     height: 250,
     paddingBottom: 10,
     justifyContent: "flex-end",
-    alignItems: "center"
+    alignItems: "center",
   },
   card: {
     backgroundColor: "#FFF",
