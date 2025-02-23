@@ -14,13 +14,28 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCkDiAe2NAVMhrKJxs1S3f0uQ91HVQ5Ico"
+        }
+      },
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.TuftNuts",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCkDiAe2NAVMhrKJxs1S3f0uQ91HVQ5Ico"
+        }
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.TuftNuts"
     },
     "web": {
       "bundler": "metro",
@@ -32,6 +47,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ebc159a7-ffd0-48c6-a24e-b112b6c508e3"
+      }
     }
   }
 }
