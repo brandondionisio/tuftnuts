@@ -15,12 +15,18 @@ import {
   Pressable,
   Keyboard,
 } from "react-native";
+import { writePostData } from "@/firebase";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import * as MediaLibrary from "expo-media-library";
 
 export default function NewPostForm() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   const openImagePicker = async () => {
     // Request permission
@@ -40,39 +46,73 @@ export default function NewPostForm() {
       quality: 1,
     });
 
+    // result.assets[0].uri
+    // result
+
     if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
+      const imageUri = result.assets[0].uri;
+      console.log("Image URI: ", imageUri);
+      setSelectedImage(imageUri);
+
+      try {
+        let asset = await MediaLibrary.createAssetAsync(imageUri);
+
+        if (!asset || !asset.id) {
+          console.error("Error: Asset is null or undefined");
+          Alert.alert("Error", "Count not save image to media library.");
+          return;
+        }
+
+        const assetInfo = await MediaLibrary.getAssetInfoAsync(asset.id);
+
+        if (assetInfo?.location) {
+          console.log("Photo latitude: ", assetInfo.location.latitude);
+          console.log("Photo longitude: ", assetInfo.location.longitude);
+          setLocation({
+            latitude: assetInfo.location.latitude,
+            longitude: assetInfo.location.longitude,
+          });
+          console.log("Image Location:", assetInfo.location);
+        } else {
+          console.log("No location data available.");
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
   const [formData, setFormData] = useState({
     location: "",
-    date: "",
     name: "",
     description: "",
   });
 
   const handleChange = (
-    key: "location" | "date" | "name" | "description",
+    key: "location" | "name" | "description",
     value: string
   ) => {
     setFormData({ ...formData, [key]: value });
   };
 
   const handleSubmit = () => {
-    if (
-      !formData.location ||
-      !formData.date ||
-      !formData.name ||
-      !formData.description
-    ) {
+    if (!formData.location || !formData.name || !formData.description) {
       Alert.alert("Error", "All fields are required!");
       return;
     }
 
+    writePostData(
+      formData.name,
+      formData.description,
+      formData.location,
+      location?.latitude,
+      location?.longitude,
+      selectedImage,
+      0
+    );
     // Here you would typically write the data to your backend or Firebase.
     Alert.alert("Success", "Your squirrel was posted!");
-    setFormData({ location: "", date: "", name: "", description: "" });
+    setFormData({ location: "", name: "", description: "" });
   };
 
   return (
@@ -85,7 +125,7 @@ export default function NewPostForm() {
           <TextInput
             style={styles.input}
             placeholder="Location"
-            placeholderTextColor={"#EEEEEE"}
+            placeholderTextColor={"#3e434a"}
             value={formData.location}
             onChangeText={(val) => handleChange("location", val)}
           />
@@ -96,7 +136,7 @@ export default function NewPostForm() {
           <TextInput
             style={styles.input}
             placeholder="Squirrel's Name"
-            placeholderTextColor={"#EEEEEE"}
+            placeholderTextColor={"#3e434a"}
             value={formData.name}
             onChangeText={(val) => handleChange("name", val)}
           />
@@ -106,7 +146,7 @@ export default function NewPostForm() {
           <TextInput
             style={styles.input}
             placeholder="Enter description"
-            placeholderTextColor={"#EEEEEE"}
+            placeholderTextColor={"#3e434a"}
             value={formData.description}
             onChangeText={(val) => handleChange("description", val)}
           />
@@ -129,33 +169,27 @@ export default function NewPostForm() {
             </Pressable>
           ) : (
             // <Button title="Pick an Image" onPress={openImagePicker} />
-            <>
-              {/* <Image source={{ uri: selectedImage }} style={styles.image} /> */}
-              <Pressable style={styles.photoChoice} onPress={openImagePicker}>
-                <View style={styles.cardShadow}>
-                  <View style={styles.card}>
-                    <ImageBackground
-                      source={{ uri: selectedImage }}
-                      style={styles.squirrelImage}
-                      resizeMode="cover"
-                    >
-                      <View style={styles.infoContainer}>
-                        <BlurView
-                          intensity={20}
-                          tint="light"
-                          style={styles.selectNew}
-                        >
-                          <Text style={styles.infoText}>
-                            Select a New Image
-                          </Text>
-                        </BlurView>
-                      </View>
-                    </ImageBackground>
-                  </View>
+            <Pressable style={styles.photoChoice} onPress={openImagePicker}>
+              <View style={styles.cardShadow}>
+                <View style={styles.card}>
+                  <ImageBackground
+                    source={{ uri: selectedImage }}
+                    style={styles.squirrelImage}
+                    resizeMode="cover"
+                  >
+                    <View style={styles.infoContainer}>
+                      <BlurView
+                        intensity={20}
+                        tint="light"
+                        style={styles.selectNew}
+                      >
+                        <Text style={styles.infoText}>Select a New Image</Text>
+                      </BlurView>
+                    </View>
+                  </ImageBackground>
                 </View>
-              </Pressable>
-              {/* <Button title="Choose New Image" onPress={openImagePicker} /> */}
-            </>
+              </View>
+            </Pressable>
           )}
           {/* <NewPostForm /> */}
         </View>

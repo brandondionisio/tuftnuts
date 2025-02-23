@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 import { getDatabase, ref, set, runTransaction, get } from "firebase/database";
 
 const firebaseConfig = {
@@ -18,8 +18,12 @@ const app = initializeApp(firebaseConfig);
 // Only initialize analytics if in a browser environment
 let analytics;
 if (typeof window !== "undefined") {
-  analytics = getAnalytics(app);
-}
+    isSupported().then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      }
+    });
+  }
 
 // Function to get the next auto-incremented user ID
 function getNextUserId(db, callback) {
@@ -65,8 +69,6 @@ function writePostData(squirrel_name, description, location, latitude, longitude
   });
 }
 
-// Example usage:
-writePostData("Nutty", "He stole my lunch", "2/22", "Tisch Library", "DEMO_URL");
 
 async function getAllUsers() {
   const db = getDatabase(app);
@@ -134,8 +136,25 @@ async function getAllUserCoordinates() {
       throw error;
     }
 }
-  
-// Example usage for reading data:
-getAllUsers();
 
-export { app, analytics, writePostData, getAllUsers, getAllUserCoordinates };
+async function getUserCount() {
+    const db = getDatabase(app);
+    const usersRef = ref(db, "users");
+    
+    try {
+      const snapshot = await get(usersRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Return the number of keys (users) in the data object
+        return Object.keys(data).length;
+      } else {
+        console.log("No user data available");
+        return 0;
+      }
+    } catch (error) {
+      console.error("Error retrieving user data:", error);
+      throw error;
+    }
+  }
+
+export { app, analytics, writePostData, getAllUsers, getAllUserCoordinates, getUserCount };

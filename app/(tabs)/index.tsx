@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useFonts } from "expo-font";
 import { BlurView } from "expo-blur";
-import { getAllUsers } from "../../firebase.js";
+import { getAllUsers, getUserCount } from "../../firebase.js";
 const AcornIcon = require("../../assets/images/acorn.png");
 const AcornLikeIcon = require("../../assets/images/acorn-like.png");
 const SquirrelIcon = require("../../assets/images/white_squirrel.png");
@@ -82,20 +82,17 @@ const starterPosts: Post[] = [
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState<Post[]>(starterPosts);
-
-  const [fontsLoaded] = useFonts({
-    // 'Poppins-Bold': require('../../assets/fonts/'),
-    "Header-Font": require("../../assets/fonts/font3.ttf"),
-  });
-  if (!fontsLoaded) return null;
+  const [squirrelCount, setSquirrelCount] = useState<String>("");
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const data = await getAllUsers();
+        const squirrel_count = await getUserCount();
         // console.log("DATA after fetch: ", data);
         // If getAllUsers returns null, you can set it to an empty array.
         setPosts(data || []);
+        setSquirrelCount(String(squirrel_count));
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
@@ -104,6 +101,12 @@ export default function HomeScreen() {
     fetchPosts();
     console.log("re-rendering home screen");
   }, []);
+
+  const [fontsLoaded] = useFonts({
+    // 'Poppins-Bold': require('../../assets/fonts/'),
+    "Header-Font": require("../../assets/fonts/font3.ttf"),
+  });
+  if (!fontsLoaded) return <Text>Font loading...</Text>;
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -122,7 +125,7 @@ export default function HomeScreen() {
             </View>
             <View style={styles.nutTextContainer}>
               <Text style={styles.nutLabel}>SQUIRRELS SPOTTED</Text>
-              <Text style={styles.nutCount}>428</Text>
+              <Text style={styles.nutCount}>{squirrelCount}</Text>
             </View>
           </View>
         </View>
