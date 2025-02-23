@@ -17,13 +17,6 @@ const AcornIcon = require("../../assets/images/acorn.png");
 const AcornLikeIcon = require("../../assets/images/acorn-like.png");
 const SquirrelIcon = require("../../assets/images/white_squirrel.png");
 
-const squirrelImage =
-  "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallup.net%2Fwp-content%2Fuploads%2F2019%2F10%2F559985-squirrel-funny-humor.jpg&f=1&nofb=1&ipt=c6a6e896431605ae43c6772c0fb4ef4d635de2b2f6074ec82d36edcb17e55c65&ipo=images";
-const squirrelImage3 =
-  "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.rd.com%2Fwp-content%2Fuploads%2F2019%2F09%2FGettyImages-1126205831.jpg&f=1&nofb=1&ipt=686936b2d051b019b232b4e0ce24df7ea7a4d42c6eb03e088ce3d9165c04a87d&ipo=images";
-const squirrelImage2 =
-  "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.thespruce.com%2Fthmb%2FE_YJx-xqzUQpLAUtxuYEplVtfOs%3D%2F1500x0%2Ffilters%3Ano_upscale()%3Amax_bytes(150000)%3Astrip_icc()%2Fgetting-squirrels-out-of-your-house-2656316-hero-ddb020f039d14ad9815cf6de682311e9.jpg&f=1&nofb=1&ipt=cbf5e6f84f96312c55fd2de8ab8c08871c3e3065913bbbac2d4dc4a456413b46&ipo=images";
-
 type Post = {
   id: string;
   image: string;
@@ -32,7 +25,7 @@ type Post = {
   squirrelName: string;
   description: string;
   nut_count: number;
-  liked?: boolean; // add a liked property
+  liked?: boolean;
 };
 
 interface SightingCardProps {
@@ -49,38 +42,42 @@ interface SightingCardProps {
 export default function HomeScreen() {
   const formatDateTime = (dateString: string) => {
     const [datePart, timePart] = dateString.split(", ");
-
     if (!datePart || !timePart) return "Invalid Date";
-
     const newDatePart = datePart.slice(0, -5);
-    const timeOfDay = timePart.slice(-2, timePart.length);
+    const timeOfDay = timePart.slice(-2);
     const newTimePart = timePart.slice(0, -6);
     return `${newDatePart}, ${newTimePart}${timeOfDay}`;
   };
 
   const [posts, setPosts] = useState<Post[]>([]);
-  const [squirrelCount, setSquirrelCount] = useState<String>("");
+  const [squirrelCount, setSquirrelCount] = useState<string>("");
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  // Create a fetchPosts function that can be reused
+  const fetchPosts = async () => {
+    try {
+      const data = await getAllUsers();
+      const squirrel_count = await getUserCount();
+      console.log("DATA after fetch: ", data);
+      setPosts(data || []);
+      setSquirrelCount(String(squirrel_count));
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await getAllUsers();
-        const squirrel_count = await getUserCount();
-        console.log("DATA after fetch: ", data);
-        // If getAllUsers returns null, you can set it to an empty array.
-        setPosts(data || []);
-        setSquirrelCount(String(squirrel_count));
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    };
-
     fetchPosts();
     console.log("re-rendering home screen");
   }, []);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchPosts();
+    setRefreshing(false);
+  };
+
   const [fontsLoaded] = useFonts({
-    // 'Poppins-Bold': require('../../assets/fonts/'),
     "Header-Font": require("../../assets/fonts/font3.ttf"),
   });
   if (!fontsLoaded) return <Text>Font loading...</Text>;
@@ -93,17 +90,24 @@ export default function HomeScreen() {
           <Text style={styles.headerText}>Tuft Nuts</Text>
         </View>
 
-        {/* Nut Count Section */}
+        {/* Nut Count Section with Refresh Button wrapped in a shadow card */}
         <View style={styles.cardShadow}>
           <View style={styles.nutCountContainer}>
             <View style={styles.nutIcon}>
               <Image style={{ width: 50, height: 50 }} source={SquirrelIcon} />
-              {/* <FontAwesome name="tree" size={28} color="black" /> */}
             </View>
             <View style={styles.nutTextContainer}>
               <Text style={styles.nutLabel}>SQUIRRELS SPOTTED</Text>
               <Text style={styles.nutCount}>{squirrelCount}</Text>
             </View>
+            <Pressable
+              onPress={handleRefresh}
+              style={styles.smallRefreshButton}
+            >
+              <Text style={styles.smallRefreshButtonText}>
+                {refreshing ? "⟳" : "⟳"}
+              </Text>
+            </Pressable>
           </View>
         </View>
 
@@ -114,7 +118,6 @@ export default function HomeScreen() {
               key={post.id}
               image={post.image}
               time={formatDateTime(post.time)}
-              // time={post.time}
               location={post.location}
               name={post.squirrelName}
               description={post.description}
@@ -123,14 +126,12 @@ export default function HomeScreen() {
               onLike={() => {
                 const newPosts = [...posts];
                 if (newPosts[index].liked) {
-                  // If already liked, remove the like
                   newPosts[index].liked = false;
                   newPosts[index].nut_count = Math.max(
                     newPosts[index].nut_count - 1,
                     0
                   );
                 } else {
-                  // Otherwise, add a like
                   newPosts[index].liked = true;
                   newPosts[index].nut_count++;
                 }
@@ -173,10 +174,9 @@ const SightingCard: React.FC<SightingCardProps> = ({
         <BlurView intensity={50} tint="light" style={styles.cardFooter}>
           <Text style={styles.description}>{description}</Text>
           <Pressable style={styles.likesContainer} onPress={onLike}>
-            {liked && (
+            {liked ? (
               <Image style={{ width: 24, height: 24 }} source={AcornLikeIcon} />
-            )}
-            {!liked && (
+            ) : (
               <Image style={{ width: 24, height: 24 }} source={AcornIcon} />
             )}
             <Text style={styles.likesText}>{nut_count}</Text>
@@ -188,13 +188,6 @@ const SightingCard: React.FC<SightingCardProps> = ({
 );
 
 const styles = StyleSheet.create({
-  // bgImage: {
-  //   width: '100%',
-  //   height: '100%',
-  //   flex: 1,
-  //   resizeMode: 'cover',
-  //   justifyContent: 'center',
-  // },
   safeContainer: {
     flex: 1,
     backgroundColor: "#5c2c06",
@@ -218,7 +211,6 @@ const styles = StyleSheet.create({
   nutCountContainer: {
     flexDirection: "row",
     backgroundColor: "white",
-    margin: 10,
     padding: 15,
     borderRadius: 15,
     alignItems: "center",
@@ -227,7 +219,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#5c2c06",
     padding: 10,
     borderRadius: 50,
-
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.4,
@@ -289,23 +280,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 300,
   },
-  topBar: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
-
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255, 255, 255, 0.6)",
-  },
-  topBarText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "300",
-    textAlign: "center",
-    letterSpacing: 0.4,
-  },
   cardFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -329,5 +303,19 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontSize: 18,
     color: "black",
+  },
+  // Styles for the small refresh button
+  smallRefreshButton: {
+    backgroundColor: "#5c2c06",
+    padding: 10,
+    borderRadius: 20,
+    marginLeft: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  smallRefreshButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
