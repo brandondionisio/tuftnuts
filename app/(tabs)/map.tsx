@@ -1,12 +1,13 @@
-import { StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Image } from "react-native";
 import { writePostData, getAllUsers } from "../../firebase";
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { Text, View } from "@/components/Themed";
 import { Button } from "react-native";
-// import Squirrel from "../../assets/images/squirrel-svgrepo-com.png";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 
 export default function TabOneScreen() {
+  // Define the initial region centered at Tufts University
   const initialRegion = {
     latitude: 42.4078,
     longitude: -71.1192,
@@ -43,16 +44,12 @@ export default function TabOneScreen() {
         initialRegion={initialRegion}
         provider={PROVIDER_DEFAULT}
       >
-        <Marker
-          coordinate={{
-            latitude: 42.4078,
-            longitude: -71.1192,
-          }}
-          title="Tufts University"
-          description="Main campus of Tufts University"
-          style={styles.squirrel}
-          image={require("../../assets/images/squirrel-svgrepo-com.png")}
-        />
+        <Marker coordinate={{ latitude: 42.4078, longitude: -71.1192 }}>
+          <Image
+            source={require("../../assets/images/squirrel-svgrepo-com.png")}
+            style={styles.squirrel}
+          />
+        </Marker>
       </MapView>
       <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
@@ -75,7 +72,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   squirrel: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
   },
 });

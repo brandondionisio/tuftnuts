@@ -12,9 +12,8 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { FontAwesome } from "@expo/vector-icons";
-import AcornIcon from "../../assets/images/acorn.png";
-import SquirrelIcon from "../../assets/images/white_squirrel.png";
-import LeavesBg from "../../assets/images/leaves.jpg";
+const AcornIcon = require("../../assets/images/acorn.png");
+const SquirrelIcon = require("../../assets/images/white_squirrel.png");
 
 const squirrelImage =
   "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallup.net%2Fwp-content%2Fuploads%2F2019%2F10%2F559985-squirrel-funny-humor.jpg&f=1&nofb=1&ipt=c6a6e896431605ae43c6772c0fb4ef4d635de2b2f6074ec82d36edcb17e55c65&ipo=images";
