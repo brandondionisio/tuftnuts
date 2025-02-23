@@ -126,7 +126,7 @@ export default function NewPostForm() {
           <TextInput
             style={styles.input}
             placeholder="Location"
-            placeholderTextColor={"#3e434a"}
+            placeholderTextColor={"#b8bbbf"}
             value={formData.location}
             onChangeText={(val) => handleChange("location", val)}
           />
@@ -137,7 +137,7 @@ export default function NewPostForm() {
           <TextInput
             style={styles.input}
             placeholder="Squirrel's Name"
-            placeholderTextColor={"#3e434a"}
+            placeholderTextColor={"#b8bbbf"}
             value={formData.name}
             onChangeText={(val) => handleChange("name", val)}
           />
@@ -147,7 +147,7 @@ export default function NewPostForm() {
           <TextInput
             style={styles.input}
             placeholder="Enter description"
-            placeholderTextColor={"#3e434a"}
+            placeholderTextColor={"#b8bbbf"}
             value={formData.description}
             onChangeText={(val) => handleChange("description", val)}
           />
@@ -237,22 +237,16 @@ const styles = StyleSheet.create({
     width: 300,
   },
   textBox: {
-    // backgroundColor: "rgba(0, 0, 0, 0.27)",
-    backgroundColor: "lightgray",
+    backgroundColor: "white", // Updated to white background
     padding: 5,
     borderRadius: 10,
     borderWidth: 1,
-    // borderColor: "rgba(0, 0, 0, 0.07)",
-    borderColor: "#EEEEEE",
+    borderColor: "#707a8a", // Updated to gray border
     overflow: "hidden",
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 15,
-
-    // borderRadius: 15,
-    // backgroundColor: "transparent",
-
-    // shadowColor: "#000",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 8,

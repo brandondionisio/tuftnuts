@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getDatabase, ref, set, runTransaction, get } from "firebase/database";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDkQmJyZro8RW3G2YbHZz9OC0vbASeOYOI",
@@ -14,6 +16,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 // Only initialize analytics if in a browser environment
 let analytics;
@@ -155,6 +158,44 @@ async function getUserCount() {
       console.error("Error retrieving user data:", error);
       throw error;
     }
-  }
+}
 
-export { app, analytics, writePostData, getAllUsers, getAllUserCoordinates, getUserCount };
+// Ensure Firebase is initialized elsewhere in your project
+
+const uploadImageAsync = async (uri) => {
+    try {
+      // Convert the local URI to a blob using XMLHttpRequest
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
+        };
+        xhr.onerror = function () {
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", uri, true);
+        xhr.send(null);
+      });
+  
+      // Create a unique file name using the URI
+      const filename = uri.substring(uri.lastIndexOf("/") + 1);
+      const imageRef = storageRef(storage, `images/${filename}`);
+  
+      // Upload the blob to Firebase Storage
+      const snapshot = await uploadBytes(imageRef, blob);
+  
+      // Optionally, close the blob
+      blob.close && blob.close();
+  
+      // Get the download URL and return it
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      throw error;
+    }
+  };
+  
+
+export { app, analytics, writePostData, getAllUsers, getAllUserCoordinates, getUserCount, uploadImageAsync };

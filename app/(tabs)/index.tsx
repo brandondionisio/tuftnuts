@@ -16,7 +16,6 @@ import { getAllUsers, getUserCount } from "../../firebase.js";
 const AcornIcon = require("../../assets/images/acorn.png");
 const AcornLikeIcon = require("../../assets/images/acorn-like.png");
 const SquirrelIcon = require("../../assets/images/white_squirrel.png");
-// const HeaderFont = require("../../assets/fonts/font1.ttf");
 
 const squirrelImage =
   "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallup.net%2Fwp-content%2Fuploads%2F2019%2F10%2F559985-squirrel-funny-humor.jpg&f=1&nofb=1&ipt=c6a6e896431605ae43c6772c0fb4ef4d635de2b2f6074ec82d36edcb17e55c65&ipo=images";
@@ -47,64 +46,7 @@ interface SightingCardProps {
   onLike: () => void;
 }
 
-const starterPosts: Post[] = [
-  {
-    id: "1",
-    image: squirrelImage,
-    time: "2:18PM",
-    location: "Carmichael Hall",
-    squirrelName: "Bobby",
-    description: "Spotted this beauty outside Carm today",
-    nuts: 52,
-    liked: false,
-  },
-  {
-    id: "2",
-    image: squirrelImage2,
-    time: "11:43PM",
-    location: "Dewick Mac-Phie (inside)",
-    squirrelName: "Dylan",
-    description: "Ummm...there's a squirrel in my herb roasted chicken thigh",
-    nuts: 2,
-    liked: false,
-  },
-  {
-    id: "3",
-    image: squirrelImage3,
-    time: "12:19PM",
-    location: "Eaton Hall",
-    squirrelName: "Jeffery",
-    description: "This guy is eatin' outside Eaton",
-    nuts: 59,
-    liked: false,
-  },
-];
-
 export default function HomeScreen() {
-  const parseCustomDate = (dateString: string) => {
-    // Extract date and time separately
-    const [timePart, datePart] = dateString.split(", ");
-    console.log(timePart);
-    
-    // Extract MM/DD/YYYY
-    const [month, day, year] = datePart.split("/").map(Number);
-    
-    // Extract time (e.g., "11:34:15PM")
-    const timeMatch = timePart.match(/(\d+):(\d+):(\d+)(AM|PM)/);
-    if (!timeMatch) return "Invalid Date";
-  
-    let [_, hour, minute, second, period] = timeMatch;
-    hour = Number(hour);
-    minute = Number(minute);
-    second = Number(second);
-  
-    // Convert to 24-hour format
-    if (period === "PM" && hour !== 12) hour += 12;
-    if (period === "AM" && hour === 12) hour = 0;
-  
-    return new Date(year, month - 1, day, hour, minute, second);
-  };
-
   const formatDateTime = (dateString: string) => {
     const [datePart, timePart] = dateString.split(", ");
 
@@ -116,7 +58,7 @@ export default function HomeScreen() {
     return `${newDatePart}, ${newTimePart}${timeOfDay}`;
   };
 
-  const [posts, setPosts] = useState<Post[]>(starterPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [squirrelCount, setSquirrelCount] = useState<String>("");
 
   useEffect(() => {
