@@ -81,6 +81,41 @@ const starterPosts: Post[] = [
 ];
 
 export default function HomeScreen() {
+  const parseCustomDate = (dateString: string) => {
+    // Extract date and time separately
+    const [timePart, datePart] = dateString.split(", ");
+    console.log(timePart);
+    
+    // Extract MM/DD/YYYY
+    const [month, day, year] = datePart.split("/").map(Number);
+    
+    // Extract time (e.g., "11:34:15PM")
+    const timeMatch = timePart.match(/(\d+):(\d+):(\d+)(AM|PM)/);
+    if (!timeMatch) return "Invalid Date";
+  
+    let [_, hour, minute, second, period] = timeMatch;
+    hour = Number(hour);
+    minute = Number(minute);
+    second = Number(second);
+  
+    // Convert to 24-hour format
+    if (period === "PM" && hour !== 12) hour += 12;
+    if (period === "AM" && hour === 12) hour = 0;
+  
+    return new Date(year, month - 1, day, hour, minute, second);
+  };
+
+  const formatDateTime = (dateString: string) => {
+    const [datePart, timePart] = dateString.split(", ");
+
+    if (!datePart || !timePart) return "Invalid Date";
+
+    const newDatePart = datePart.slice(0, -5);
+    const timeOfDay = timePart.slice(-2, timePart.length);
+    const newTimePart = timePart.slice(0, -6);
+    return `${newDatePart}, ${newTimePart}${timeOfDay}`;
+  };
+
   const [posts, setPosts] = useState<Post[]>(starterPosts);
 
   const [fontsLoaded] = useFonts({
@@ -133,7 +168,8 @@ export default function HomeScreen() {
             <SightingCard
               key={post.id}
               image={post.image}
-              time={post.time}
+              time={formatDateTime(post.time)}
+              // time={post.time}
               location={post.location}
               name={post.squirrelName}
               description={post.description}
@@ -173,16 +209,17 @@ const SightingCard: React.FC<SightingCardProps> = ({
   <View style={styles.cardShadow}>
     <View style={styles.card}>
       <ImageBackground source={{ uri: image }} style={styles.squirrelImage}>
-        {/* Top bar for the squirrel's name */}
-        <View style={styles.topBar}>
-          <Text style={styles.topBarText}>{name}</Text>
-        </View>
         <View style={styles.infoContainer}>
           <BlurView intensity={20} tint="light" style={styles.infoBadge}>
-            <Text style={styles.infoText}>{time}</Text>
+            <Text style={styles.infoText}>{name}</Text>
           </BlurView>
           <BlurView intensity={20} tint="light" style={styles.infoBadge}>
             <Text style={styles.infoText}>{location}</Text>
+          </BlurView>
+        </View>
+        <View style={styles.dateTimeContainer}>
+          <BlurView intensity={20} tint="light" style={styles.infoBadge}>
+            <Text style={styles.infoText}>{time}</Text>
           </BlurView>
         </View>
         <BlurView intensity={50} tint="light" style={styles.cardFooter}>
@@ -283,6 +320,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 10,
   },
+  dateTimeContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingRight: 10,
+  },
   infoBadge: {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     padding: 5,
@@ -300,17 +342,21 @@ const styles = StyleSheet.create({
     height: 300,
   },
   topBar: {
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
+
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.6)",
   },
   topBarText: {
     color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "300",
     textAlign: "center",
+    letterSpacing: 0.4,
   },
   cardFooter: {
     flexDirection: "row",
