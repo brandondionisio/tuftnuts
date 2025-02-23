@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { writePostData, getAllUsers } from "../../firebase";
 
 export default function TabTwo() {
   // PhotoLibraryPicker Component
@@ -99,14 +100,32 @@ export default function TabTwo() {
       }
 
       // Here you would typically write the data to your backend or Firebase.
-      Alert.alert("Success", "Your squirrel was posted!");
-      setFormData({ location: "", date: "", name: "", description: "" });
+      // Alert.alert("Success", "Your squirrel was posted!");
+      // setFormData({ location: "", date: "", name: "", description: "" });
     };
 
     return (
       <ScrollView contentContainerStyle={styles.formContainer}>
         <PhotoLibraryPicker />
         <View style={styles.inputRow}>
+          <Button
+            title="Test Write to Firebase"
+            onPress={() =>
+              writePostData(
+                "NuttyBuddy",
+                "He stole my lunch",
+                "Tisch Library",
+                42.4058,
+                -71.1152,
+                "DEMO_URL",
+                0
+              )
+            }
+          />
+          <Button
+            title="Test getting all users"
+            onPress={() => console.log(getAllUsers())}
+          />
           <Text style={styles.label}>Location: </Text>
           <TextInput
             style={styles.input}

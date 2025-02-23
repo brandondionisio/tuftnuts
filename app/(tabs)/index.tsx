@@ -1,5 +1,3 @@
-// import { StyleSheet } from "react-native";
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -9,10 +7,12 @@ import {
   ScrollView,
   ImageBackground,
   Pressable,
+  Alert,
 } from "react-native";
 import { BlurView } from "expo-blur";
-import { FontAwesome } from "@expo/vector-icons";
+import { getAllUsers } from "../../firebase.js";
 const AcornIcon = require("../../assets/images/acorn.png");
+const AcornLikeIcon = require("../../assets/images/acorn-like.png");
 const SquirrelIcon = require("../../assets/images/white_squirrel.png");
 
 const squirrelImage =
@@ -22,50 +22,58 @@ const squirrelImage3 =
 const squirrelImage2 =
   "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.thespruce.com%2Fthmb%2FE_YJx-xqzUQpLAUtxuYEplVtfOs%3D%2F1500x0%2Ffilters%3Ano_upscale()%3Amax_bytes(150000)%3Astrip_icc()%2Fgetting-squirrels-out-of-your-house-2656316-hero-ddb020f039d14ad9815cf6de682311e9.jpg&f=1&nofb=1&ipt=cbf5e6f84f96312c55fd2de8ab8c08871c3e3065913bbbac2d4dc4a456413b46&ipo=images";
 
-import EditScreenInfo from "@/components/EditScreenInfo";
-// import { Text, View } from "@/components/Themed";
 type Post = {
+  id: string;
   image: string;
   time: string;
   location: string;
   squirrelName: string;
   description: string;
   nuts: number;
+  liked?: boolean; // add a liked property
 };
 
 interface SightingCardProps {
   time: string;
   location: string;
+  name: string;
   description: string;
   nuts: number;
-  image: string; // URL string for the image
+  image: string;
+  liked: boolean;
   onLike: () => void;
 }
 
-const starterPosts = [
+const starterPosts: Post[] = [
   {
+    id: "1",
     image: squirrelImage,
     time: "2:18PM",
     location: "Carmichael Hall",
     squirrelName: "Bobby",
     description: "Spotted this beauty outside Carm today",
     nuts: 52,
+    liked: false,
   },
   {
+    id: "2",
     image: squirrelImage2,
     time: "11:43PM",
     location: "Dewick Mac-Phie (inside)",
     squirrelName: "Dylan",
     description: "Ummm...there's a squirrel in my herb roasted chicken thigh",
     nuts: 2,
+    liked: false,
   },
   {
+    id: "3",
     image: squirrelImage3,
     time: "12:19PM",
     location: "Eaton Hall",
     squirrelName: "Jeffery",
     description: "A squirrel eatin' outside Eaton",
     nuts: 59,
+    liked: false,
   },
 ];
 
@@ -73,17 +81,23 @@ export default function HomeScreen() {
   const [posts, setPosts] = useState<Post[]>(starterPosts);
 
   useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const data = await getAllUsers();
+        // console.log("DATA after fetch: ", data);
+        // If getAllUsers returns null, you can set it to an empty array.
+        setPosts(data || []);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchPosts();
     console.log("re-rendering home screen");
   }, []);
 
   return (
     <View style={styles.container}>
-      {/* <ImageBackground
-        source={LeavesBg}
-        resizeMode = "cover"
-        style={styles.bgImage}
-      /> */}
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>TuftNuts</Text>
       </View>
@@ -93,7 +107,6 @@ export default function HomeScreen() {
         <View style={styles.nutCountContainer}>
           <View style={styles.nutIcon}>
             <Image style={{ width: 50, height: 50 }} source={SquirrelIcon} />
-            {/* <FontAwesome name="tree" size={28} color="black" /> */}
           </View>
           <View style={styles.nutTextContainer}>
             <Text style={styles.nutLabel}>SQUIRRELS SPOTTED</Text>
@@ -106,15 +119,25 @@ export default function HomeScreen() {
       <ScrollView>
         {posts.map((post, index) => (
           <SightingCard
-            key={post.image}
+            key={post.id}
             image={post.image}
             time={post.time}
             location={post.location}
+            name={post.squirrelName}
             description={post.description}
             nuts={post.nuts}
+            liked={!!post.liked}
             onLike={() => {
               const newPosts = [...posts];
-              newPosts[index].nuts++;
+              if (newPosts[index].liked) {
+                // If already liked, remove the like
+                newPosts[index].liked = false;
+                newPosts[index].nuts = Math.max(newPosts[index].nuts - 1, 0);
+              } else {
+                // Otherwise, add a like
+                newPosts[index].liked = true;
+                newPosts[index].nuts++;
+              }
               setPosts(newPosts);
             }}
           />
@@ -124,18 +147,23 @@ export default function HomeScreen() {
   );
 }
 
-// Sighting Card Component
 const SightingCard: React.FC<SightingCardProps> = ({
   time,
   location,
   description,
   nuts,
   image,
+  liked,
+  name,
   onLike,
 }) => (
   <View style={styles.cardShadow}>
     <View style={styles.card}>
       <ImageBackground source={{ uri: image }} style={styles.squirrelImage}>
+        {/* Top bar for the squirrel's name */}
+        <View style={styles.topBar}>
+          <Text style={styles.topBarText}>{name}</Text>
+        </View>
         <View style={styles.infoContainer}>
           <BlurView intensity={20} tint="light" style={styles.infoBadge}>
             <Text style={styles.infoText}>{time}</Text>
@@ -144,12 +172,15 @@ const SightingCard: React.FC<SightingCardProps> = ({
             <Text style={styles.infoText}>{location}</Text>
           </BlurView>
         </View>
-
         <BlurView intensity={50} tint="light" style={styles.cardFooter}>
           <Text style={styles.description}>{description}</Text>
-          {/* fix this so only can like once */}
           <Pressable style={styles.likesContainer} onPress={onLike}>
-            <Image style={{ width: 24, height: 24 }} source={AcornIcon} />
+            {liked && (
+              <Image style={{ width: 24, height: 24 }} source={AcornLikeIcon} />
+            )}
+            {!liked && (
+              <Image style={{ width: 24, height: 24 }} source={AcornIcon} />
+            )}
             <Text style={styles.likesText}>{nuts}</Text>
           </Pressable>
         </BlurView>
@@ -158,15 +189,7 @@ const SightingCard: React.FC<SightingCardProps> = ({
   </View>
 );
 
-// Styles
 const styles = StyleSheet.create({
-  // bgImage: {
-  //   width: '100%',
-  //   height: '100%',
-  //   flex: 1,
-  //   resizeMode: 'cover',
-  //   justifyContent: 'center',
-  // },
   container: {
     flex: 1,
     backgroundColor: "white",
@@ -210,7 +233,6 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#FFF",
-    // backgroundColor: "rgba(255, 255, 255, 1)",
     margin: 10,
     borderRadius: 15,
     overflow: "hidden",
@@ -219,7 +241,6 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 15,
     backgroundColor: "transparent",
-
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
@@ -232,7 +253,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   infoBadge: {
-    // backgroundColor: '#D3D3D3',
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     padding: 5,
     borderRadius: 10,
@@ -242,13 +262,24 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    // color: '#333',
     color: "black",
-    // color: 'white'
   },
   squirrelImage: {
     width: "100%",
     height: 300,
+  },
+  topBar: {
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+  },
+  topBarText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   cardFooter: {
     flexDirection: "row",
@@ -257,14 +288,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     alignItems: "center",
-    // borderTopRadius: 10,
     borderTopWidth: 1,
     borderTopColor: "rgba(255, 255, 255, 0.6)",
   },
   description: {
     flex: 1,
     fontSize: 16,
-    // color: '#333',
     color: "black",
   },
   likesContainer: {
@@ -277,35 +306,3 @@ const styles = StyleSheet.create({
     color: "black",
   },
 });
-//       <View style={styles.container}>
-//         <Text>Hello</Text>
-//       </View>
-
-//     // <View style={styles.container}>
-//     //   <Text style={styles.title}>TUFT NUTS YAY</Text>
-//     //   <View
-//     //     style={styles.separator}
-//     //     lightColor="#eee"
-//     //     darkColor="rgba(255,255,255,0.1)"
-//     //   />
-//     //   <EditScreenInfo path="app/(tabs)/index.tsx" />
-//     // </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   title: {
-//     fontSize: 20,
-//     fontWeight: "bold",
-//   },
-//   separator: {
-//     marginVertical: 30,
-//     height: 1,
-//     width: "80%",
-//   },
-// });
