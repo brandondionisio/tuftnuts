@@ -110,9 +110,10 @@ export default function NewPostForm() {
       selectedImage,
       0
     );
-    // Here you would typically write the data to your backend or Firebase.
+   
     Alert.alert("Success", "Your squirrel was posted!");
     setFormData({ location: "", name: "", description: "" });
+    setSelectedImage(null);
   };
 
   return (
