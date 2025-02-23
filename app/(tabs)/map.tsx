@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Image } from "react-native";
-import { writePostData, getAllUserCoordinates } from "../../firebase";
-import { Text, View } from "@/components/Themed";
-import { Button } from "react-native";
+import { StyleSheet } from "react-native";
+import { getAllUserCoordinates } from "../../firebase";
+import { View } from "@/components/Themed";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 
 type Coordinate = {
@@ -79,9 +78,5 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
-  },
-  squirrel: {
-    width: 25,
-    height: 25,
   },
 });

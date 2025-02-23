@@ -68,24 +68,38 @@ function writePostData(squirrel_name, description, location, latitude, longitude
 // Example usage:
 writePostData("Nutty", "He stole my lunch", "2/22", "Tisch Library", "DEMO_URL");
 
-// Function to get all user data
 async function getAllUsers() {
-    const db = getDatabase(app);
-    const usersRef = ref(db, "users");
-    try {
-        const snapshot = await get(usersRef);
-        if (snapshot.exists()) {
-        const data = snapshot.val();
-        console.log("All user data:", data);
-        return data;
-        } else {
-        console.log("No user data available");
-        return null;
-        }
-    } catch (error) {
-        console.error("Error getting user data:", error);
-        throw error;
+  const db = getDatabase(app);
+  const usersRef = ref(db, "users");
+  try {
+    const snapshot = await get(usersRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      // Assuming data is an object with user IDs as keys
+      // and each value is an object with properties including:
+      // image, time, location, squirrel_name, description, and nuts.
+      const posts = Object.keys(data).map((key) => {
+        const userData = data[key];
+        return {
+          id: key || "",
+          image: userData.image || "",
+          time: userData.time ? new Date(userData.time).toLocaleString() : "",
+          location: userData.location || "",
+          squirrelName: userData.squirrel_name || "",
+          description: userData.description || "",
+          nuts: userData.nuts || 0,
+        };
+      });
+    //   console.log("All posts:", posts);
+      return posts;
+    } else {
+      console.log("No user data available");
+      return [];
     }
+  } catch (error) {
+    console.error("Error getting user data:", error);
+    throw error;
+  }
 }
 
 async function getAllUserCoordinates() {
