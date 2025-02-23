@@ -41,7 +41,7 @@ function getNextUserId(db, callback) {
 }
 
 // Function to write post data using an auto-incremented user ID
-function writePostData(squirrel_name, description, location, image, nut_count) {
+function writePostData(squirrel_name, description, location, latitude, longitude, image, nut_count) {
   const db = getDatabase(app);
   getNextUserId(db, (userID) => {
     const userRef = ref(db, "users/" + userID);
@@ -51,6 +51,8 @@ function writePostData(squirrel_name, description, location, image, nut_count) {
       description,
       time: { ".sv": "timestamp" },
       location,
+      latitude,
+      longitude,
       image,
       nut_count,
     })
@@ -66,27 +68,74 @@ function writePostData(squirrel_name, description, location, image, nut_count) {
 // Example usage:
 writePostData("Nutty", "He stole my lunch", "2/22", "Tisch Library", "DEMO_URL");
 
-// Function to get all user data
 async function getAllUsers() {
+  const db = getDatabase(app);
+  const usersRef = ref(db, "users");
+  try {
+    const snapshot = await get(usersRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      // Assuming data is an object with user IDs as keys
+      // and each value is an object with properties including:
+      // image, time, location, squirrel_name, description, and nuts.
+      const posts = Object.keys(data).map((key) => {
+        const userData = data[key];
+        return {
+          id: key || "",
+          image: userData.image || "",
+          time: userData.time ? new Date(userData.time).toLocaleString() : "",
+          location: userData.location || "",
+          squirrelName: userData.squirrel_name || "",
+          description: userData.description || "",
+          nuts: userData.nuts || 0,
+        };
+      });
+    //   console.log("All posts:", posts);
+      return posts;
+    } else {
+      console.log("No user data available");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error getting user data:", error);
+    throw error;
+  }
+}
+
+async function getAllUserCoordinates() {
     const db = getDatabase(app);
     const usersRef = ref(db, "users");
+  
     try {
-        const snapshot = await get(usersRef);
-        if (snapshot.exists()) {
+      const snapshot = await get(usersRef);
+      if (snapshot.exists()) {
         const data = snapshot.val();
-        console.log("All user data:", data);
-        return data;
-        } else {
+        // Assume data is an object with user IDs as keys:
+        // { userId1: { latitude, longitude, ... }, userId2: { ... } }
+        const coordinates = Object.keys(data)
+          .map((key) => {
+            const { latitude, longitude, squirrel_name } = data[key];
+            // Ensure both latitude and longitude exist
+            if (latitude !== undefined && longitude !== undefined && squirrel_name !== undefined) {
+              return { latitude, longitude, squirrel_name };
+            }
+            return null;
+          })
+          .filter((coord) => coord !== null);
+  
+        console.log("User Coordinates: ", coordinates);
+        return coordinates;
+      } else {
         console.log("No user data available");
-        return null;
-        }
+        return [];
+      }
     } catch (error) {
-        console.error("Error getting user data:", error);
-        throw error;
+      console.error("Error getting user data:", error);
+      throw error;
     }
 }
   
 // Example usage for reading data:
 getAllUsers();
 
-export { app, analytics, writePostData, getAllUsers };
+export { app, analytics, writePostData, getAllUsers, getAllUserCoordinates };
