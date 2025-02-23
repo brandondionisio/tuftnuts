@@ -1,18 +1,18 @@
 import { StyleSheet } from "react-native";
 import { writePostData, getAllUsers } from "../../firebase";
-
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { Text, View } from "@/components/Themed";
 import { Button } from "react-native";
-// import MapView, { PROVIDER_DEFAULT } from "react-native-maps";
+// import Squirrel from "../../assets/images/squirrel-svgrepo-com.png";
+import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 
 export default function TabOneScreen() {
-  // const initialRegion = {
-  //   latitude: 37.78825,
-  //   longitude: -122.4324,
-  //   latitudeDelta: 0.0922,
-  //   longitudeDelta: 0.0421,
-  // };
+  const initialRegion = {
+    latitude: 42.4078,
+    longitude: -71.1192,
+    latitudeDelta: 0.0322,
+    longitudeDelta: 0.00521,
+  };
 
   return (
     <View style={styles.container}>
@@ -38,7 +38,22 @@ export default function TabOneScreen() {
         title="Test getting all users"
         onPress={() => console.log(getAllUsers())}
       />
-      {/* <MapView style={styles.map}></MapView> */}
+      <MapView
+        style={styles.map}
+        initialRegion={initialRegion}
+        provider={PROVIDER_DEFAULT}
+      >
+        <Marker
+          coordinate={{
+            latitude: 42.4078,
+            longitude: -71.1192,
+          }}
+          title="Tufts University"
+          description="Main campus of Tufts University"
+          style={styles.squirrel}
+          image={require("../../assets/images/squirrel-svgrepo-com.png")}
+        />
+      </MapView>
       <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
   );
@@ -50,10 +65,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
   separator: {
     marginVertical: 30,
     height: 1,
@@ -62,5 +73,9 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
+  },
+  squirrel: {
+    width: 30,
+    height: 30,
   },
 });
