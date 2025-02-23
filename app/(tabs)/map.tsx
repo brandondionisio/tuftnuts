@@ -1,12 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Image } from "react-native";
-import { writePostData, getAllUsers } from "../../firebase";
-import EditScreenInfo from "@/components/EditScreenInfo";
+import { writePostData, getAllUserCoordinates } from "../../firebase";
 import { Text, View } from "@/components/Themed";
 import { Button } from "react-native";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 
+type Coordinate = {
+  latitude: number;
+  longitude: number;
+  squirrel_name: string;
+};
+
 export default function TabOneScreen() {
+  const [markers, setMarkers] = useState<Coordinate[]>([]);
+
+  useEffect(() => {
+    // Fetch marker data when the component mounts.
+    getAllUserCoordinates()
+      .then((coords) => {
+        console.log("COORDS ARE: ", coords);
+        // Expecting coords to be an array of objects like:
+        // [{ latitude: 42.4078, longitude: -71.1192, ... }, ...]
+        if (coords) {
+          setMarkers(coords);
+        }
+      })
+      .catch((error) => console.error("Error fetching users:", error));
+  }, []);
+
   // Define the initial region centered at Tufts University
   const initialRegion = {
     latitude: 42.4078,
@@ -17,41 +38,29 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <Text className="text-red-500">TUFT NUTS YAY</Text>
       <View
         style={styles.separator}
         lightColor="#eee"
         darkColor="rgba(255,255,255,0.1)"
-      />
-      <Button
-        title="Test Write to Firebase"
-        onPress={() =>
-          writePostData(
-            "NuttyBuddy",
-            "He stole my lunch",
-            "Tisch Library",
-            "DEMO_URL",
-            0
-          )
-        }
-      />
-      <Button
-        title="Test getting all users"
-        onPress={() => console.log(getAllUsers())}
       />
       <MapView
         style={styles.map}
         initialRegion={initialRegion}
         provider={PROVIDER_DEFAULT}
       >
-        <Marker coordinate={{ latitude: 42.4078, longitude: -71.1192 }}>
-          <Image
-            source={require("../../assets/images/squirrel-svgrepo-com.png")}
-            style={styles.squirrel}
-          />
-        </Marker>
+        {markers.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: marker.latitude,
+              longitude: marker.longitude,
+            }}
+            tracksViewChanges={false}
+            title={marker.squirrel_name}
+            image={require("../../assets/images/squirrel-svgrepo-com.png")}
+          ></Marker>
+        ))}
       </MapView>
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
     </View>
   );
 }

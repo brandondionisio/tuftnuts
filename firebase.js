@@ -41,7 +41,7 @@ function getNextUserId(db, callback) {
 }
 
 // Function to write post data using an auto-incremented user ID
-function writePostData(squirrel_name, description, location, image, nut_count) {
+function writePostData(squirrel_name, description, location, latitude, longitude, image, nut_count) {
   const db = getDatabase(app);
   getNextUserId(db, (userID) => {
     const userRef = ref(db, "users/" + userID);
@@ -51,6 +51,8 @@ function writePostData(squirrel_name, description, location, image, nut_count) {
       description,
       time: { ".sv": "timestamp" },
       location,
+      latitude,
+      longitude,
       image,
       nut_count,
     })
@@ -85,8 +87,41 @@ async function getAllUsers() {
         throw error;
     }
 }
+
+async function getAllUserCoordinates() {
+    const db = getDatabase(app);
+    const usersRef = ref(db, "users");
+  
+    try {
+      const snapshot = await get(usersRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Assume data is an object with user IDs as keys:
+        // { userId1: { latitude, longitude, ... }, userId2: { ... } }
+        const coordinates = Object.keys(data)
+          .map((key) => {
+            const { latitude, longitude, squirrel_name } = data[key];
+            // Ensure both latitude and longitude exist
+            if (latitude !== undefined && longitude !== undefined && squirrel_name !== undefined) {
+              return { latitude, longitude, squirrel_name };
+            }
+            return null;
+          })
+          .filter((coord) => coord !== null);
+  
+        console.log("User Coordinates: ", coordinates);
+        return coordinates;
+      } else {
+        console.log("No user data available");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error getting user data:", error);
+      throw error;
+    }
+}
   
 // Example usage for reading data:
 getAllUsers();
 
-export { app, analytics, writePostData, getAllUsers };
+export { app, analytics, writePostData, getAllUsers, getAllUserCoordinates };
