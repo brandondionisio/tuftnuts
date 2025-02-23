@@ -9,7 +9,6 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import database from "@react-native-firebase/database";
 
 export default function TabTwo() {
   const PhotoLibraryPicker = () => {
@@ -95,18 +94,18 @@ export default function TabTwo() {
         return;
       }
 
-      database()
-        .ref("/posts")
-        .push()
-        .set(formData)
-        .then(() => {
-          Alert.alert("Success", "Your squirrel was posted!");
-          setFormData({ location: "", date: "", name: "", description: "" });
-        })
-        .catch((error: Error) => {
-          console.error(error);
-          Alert.alert("Error", "Failed to post :(");
-        });
+      // database()
+      //   .ref("/posts")
+      //   .push()
+      //   .set(formData)
+      //   .then(() => {
+      //     Alert.alert("Success", "Your squirrel was posted!");
+      //     setFormData({ location: "", date: "", name: "", description: "" });
+      //   })
+      //   .catch((error: Error) => {
+      //     console.error(error);
+      //     Alert.alert("Error", "Failed to post :(");
+      //   });
     };
 
     return (
