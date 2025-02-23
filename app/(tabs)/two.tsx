@@ -12,11 +12,13 @@ import {
   ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 
 export default function TabTwo() {
   // PhotoLibraryPicker Component
   const PhotoLibraryPicker = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
     const openImagePicker = async () => {
       // Request permission
@@ -30,6 +32,12 @@ export default function TabTwo() {
         return;
       }
 
+      const { status: mediaLibraryStatus } = await MediaLibrary.requestPermissionsAsync();
+      if (mediaLibraryStatus !== "granted") {
+        Alert.alert("Permission Denied", "Please enable media library access.");
+        return;
+      }
+
       // Open gallery
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -38,9 +46,35 @@ export default function TabTwo() {
       });
 
       if (!result.canceled) {
-        setSelectedImage(result.assets[0].uri);
+        const imageUri = result.assets[0].uri
+        console.log("Image URI:", imageUri);
+        setSelectedImage(imageUri);
+
+        try {
+          let asset = await MediaLibrary.createAssetAsync(imageUri);
+
+          if (!asset || !asset.id) {
+            console.error("Error: Asset is null or undefined");
+            Alert.alert("Error", "Could not save image to media library.");
+            return;
+          }
+
+          const assetInfo = await MediaLibrary.getAssetInfoAsync(asset.id);
+
+          if (assetInfo?.location) {
+            setLocation({
+              latitude: assetInfo.location.latitude,
+              longitude: assetInfo.location.longitude,
+            });
+            console.log("Image Location:", assetInfo.location);
+          } else {
+            console.log("No location data available.");
+          } 
+        } catch (error) {
+          console.error("Error retrieving asset info:", error);
+        }
       }
-    };
+    }
 
     return (
       <View style={styles.centerContainer}>

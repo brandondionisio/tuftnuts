@@ -4,12 +4,12 @@
     "slug": "TuftNuts",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/squirrel-svgrepo-com.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/transparent.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -23,7 +23,8 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload images.",
         "NSPhotoLibraryAddUsageDescription": "We need access to save images to your library."
-      }
+      },
+      "bundleIdentifier": "com.anonymous.TuftNuts"
     },
     "android": {
       "config": {
