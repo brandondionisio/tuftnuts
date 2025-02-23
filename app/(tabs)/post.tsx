@@ -17,80 +17,14 @@ import { BlurView } from "expo-blur";
 
 import NewPostForm from "../../components/post_form";
 
-// const PhotoLibraryPicker = () => {
-//   // const addPhotoImage = "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2F4.bp.blogspot.com%2F-H2sYChCU-Tg%2FTaxiz20sxCI%2FAAAAAAAABbc%2FDUXa8sEtYlM%2Fs1600%2Fred%2Bsquirrel.jpg&f=1&nofb=1&ipt=cc5a88adf04dd54350b53d013e12193041ea4bea3e0b1187638a818c1d568cf3&ipo=images"
-//   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-//   const openImagePicker = async () => {
-//     // Request permission
-//     const { status } =
-//       await ImagePicker.requestMediaLibraryPermissionsAsync();
-//     if (status !== "granted") {
-//       Alert.alert(
-//         "Permission Denied",
-//         "Please enable photo library access in Settings."
-//       );
-//       return;
-//     }
-
-//     // Open gallery
-//     const result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: false,
-//       quality: 1,
-//     });
-
-//     if (!result.canceled) {
-//       setSelectedImage(result.assets[0].uri);
-//     }
-//   };
-
-//   return (
-//     <View style={styles.centerContainer}>
-//       {!selectedImage ? (
-//         <Pressable style={styles.photoChoice} onPress={openImagePicker}>
-//           <View style={styles.cardShadow}>
-//             <View style={styles.card}>
-//               <ImageBackground source={{ uri: AddImage }} style={styles.addImage} resizeMode="cover">
-//                 <Ionicons size={80} name="add-circle" color="lightgray"></Ionicons>
-//               </ImageBackground>
-//             </View>
-//           </View>
-//         </Pressable>
-//         // <Button title="Pick an Image" onPress={openImagePicker} />
-//       ) : (
-//         <>
-//           {/* <Image source={{ uri: selectedImage }} style={styles.image} /> */}
-//           <Pressable style={styles.photoChoice} onPress={openImagePicker}>
-//           <View style={styles.cardShadow}>
-//             <View style={styles.card}>
-//               <ImageBackground source={{ uri: selectedImage }} style={styles.squirrelImage} resizeMode="cover">
-//                 <View style={styles.infoContainer}>
-//                   <BlurView intensity={20} tint="light" style={styles.infoBadge}>
-//                     <Text style={styles.infoText}>Select a New Image</Text>
-//                   </BlurView>
-//                 </View>
-//               </ImageBackground>
-//             </View>
-//           </View>
-//         </Pressable>
-//           {/* <Button title="Choose New Image" onPress={openImagePicker} /> */}
-//         </>
-//       )}
-//       {/* <NewPostForm /> */}
-//     </View>
-//   );
-// };
-
 export default function Post() {
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>TuftNuts</Text>
+        <Text style={styles.headerText}>Tuft Nuts</Text>
       </View>
       <View style={styles.container}>
         <NewPostForm />
-        {/* <PhotoLibraryPicker /> */}
       </View>
     </SafeAreaView>
   );

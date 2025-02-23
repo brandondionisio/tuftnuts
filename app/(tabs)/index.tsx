@@ -110,7 +110,7 @@ export default function HomeScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerText}>TuftNuts</Text>
+          <Text style={styles.headerText}>Tuft Nuts</Text>
         </View>
 
         {/* Nut Count Section */}

@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     },
     formContainer: {
       flexGrow: 1,
+      marginTop: 15,
     //   padding: 20,
     //   alignItems: "center",
     //   justifyContent: "center",
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
       infoBadge: {
         // backgroundColor: '#D3D3D3',
         // backgroundColor: "rgba(0, 0, 0, 0.3)",
-        backgroundColor: 'gray',
+        backgroundColor: '#5c2c06',
         alignItems: 'center',
         justifyContent: 'center',
         width: 100,
