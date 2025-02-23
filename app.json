@@ -14,7 +14,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload images.",
+        "NSPhotoLibraryAddUsageDescription": "We need access to save images to your library."
+      }
     },
     "android": {
       "adaptiveIcon": {
