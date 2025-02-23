@@ -1,29 +1,39 @@
-
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, View, Button, Image, Alert} from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Button,
+  Image,
+  Alert,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import database from "@react-native-firebase/database";
 
 export default function TabTwo() {
   const PhotoLibraryPicker = () => {
-
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-   
-    const openImagePicker = async () => {   
+
+    const openImagePicker = async () => {
       // Request permission
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permission Denied", "Please enable photo library access in Settings.");
+        Alert.alert(
+          "Permission Denied",
+          "Please enable photo library access in Settings."
+        );
         return;
       }
-  
+
       // Open gallery
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
         quality: 1,
       });
-  
+
       if (!result.canceled) {
         setSelectedImage(result.assets[0].uri);
       }
@@ -31,19 +41,18 @@ export default function TabTwo() {
 
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        {!selectedImage && <Button title="Pick an Image" onPress={openImagePicker} />}
+        {!selectedImage && (
+          <Button title="Pick an Image" onPress={openImagePicker} />
+        )}
         {selectedImage && (
           <>
-          <Image
-            source={{ uri: selectedImage  }}
-            style={ styles.image }
-          />
-          <Button title="Choose New Image" onPress={openImagePicker} />
+            <Image source={{ uri: selectedImage }} style={styles.image} />
+            <Button title="Choose New Image" onPress={openImagePicker} />
           </>
         )}
       </View>
     );
-  };  
+  };
 
   const TextInputBox = () => {
     const [text, setText] = useState("");
@@ -68,12 +77,20 @@ export default function TabTwo() {
       description: "",
     });
 
-    const handleChange = (key: "location" | "date" | "name" | "description", value: string) => {
-      setFormData({ ...formData, [key]: value});
+    const handleChange = (
+      key: "location" | "date" | "name" | "description",
+      value: string
+    ) => {
+      setFormData({ ...formData, [key]: value });
     };
 
     const handleSubmit = () => {
-      if (!formData.location || !formData.date || !formData.name || !formData.description) {
+      if (
+        !formData.location ||
+        !formData.date ||
+        !formData.name ||
+        !formData.description
+      ) {
         Alert.alert("Error", "All fields are required!");
         return;
       }
@@ -83,69 +100,66 @@ export default function TabTwo() {
         .push()
         .set(formData)
         .then(() => {
-          Alert.alert("Success", "Your squirrel was posted!")
-          setFormData({ location: "", date: "", name: "", description: "",});
+          Alert.alert("Success", "Your squirrel was posted!");
+          setFormData({ location: "", date: "", name: "", description: "" });
         })
         .catch((error: Error) => {
           console.error(error);
-          Alert.alert("Error", "Failed to post :(")
+          Alert.alert("Error", "Failed to post :(");
         });
     };
 
-  return (
-    <View style={styles.post}>
-      <PhotoLibraryPicker />
+    return (
+      <View style={styles.post}>
+        <PhotoLibraryPicker />
 
-      <View style={ styles.textInput }>
-        <View style={styles.inputRow}>
-        <Text style={styles.label}>Location: </Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter location"
-          value={formData.location}
-          onChangeText={(val) => handleChange("location", val)}
-          />
+        <View style={styles.textInput}>
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>Location: </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter location"
+              value={formData.location}
+              onChangeText={(val) => handleChange("location", val)}
+            />
+          </View>
+
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>Date: </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter date"
+              value={formData.date}
+              onChangeText={(val) => handleChange("date", val)}
+            />
+          </View>
+
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>Squirrel's Name </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter the squirrel's name"
+              value={formData.name}
+              onChangeText={(val) => handleChange("name", val)}
+            />
+          </View>
+
+          <View style={styles.inputRow}>
+            <Text style={styles.label}>Description </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter description"
+              value={formData.description}
+              onChangeText={(val) => handleChange("description", val)}
+            />
+          </View>
         </View>
 
-        <View style={styles.inputRow}>
-        <Text style={styles.label}>Date: </Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter date"
-          value={formData.date}
-          onChangeText={(val) => handleChange("date", val)}
-          />
-        </View>
-
-        <View style={styles.inputRow}>
-        <Text style={styles.label}>Squirrel's Name </Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter the squirrel's name"
-          value={formData.name}
-          onChangeText={(val) => handleChange("name", val)}
-          />
-        </View>
-
-        <View style={styles.inputRow}>
-        <Text style={styles.label}>Description </Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter description"
-          value={formData.description}
-          onChangeText={(val) => handleChange("description", val)}
-          />
-        </View>
-
+        <Button title="Post" onPress={handleSubmit} />
       </View>
-      
-      <Button title="Post" onPress={handleSubmit} />
-
-    </View>
-  );
+    );
+  };
 }
-}
-
 
 // Styles
 const styles = StyleSheet.create({
