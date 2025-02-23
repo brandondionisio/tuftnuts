@@ -6,11 +6,15 @@ import {
   View,
   Button,
   Image,
+  ImageBackground,
   Alert,
+  Pressable,
+  ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
 export default function TabTwo() {
+  // PhotoLibraryPicker Component
   const PhotoLibraryPicker = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -39,11 +43,10 @@ export default function TabTwo() {
     };
 
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        {!selectedImage && (
+      <View style={styles.centerContainer}>
+        {!selectedImage ? (
           <Button title="Pick an Image" onPress={openImagePicker} />
-        )}
-        {selectedImage && (
+        ) : (
           <>
             <Image source={{ uri: selectedImage }} style={styles.image} />
             <Button title="Choose New Image" onPress={openImagePicker} />
@@ -53,11 +56,11 @@ export default function TabTwo() {
     );
   };
 
+  // TextInputBox Component
   const TextInputBox = () => {
     const [text, setText] = useState("");
-
     return (
-      <View>
+      <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder="Type here..."
@@ -68,6 +71,7 @@ export default function TabTwo() {
     );
   };
 
+  // Form Component
   const Form = () => {
     const [formData, setFormData] = useState({
       location: "",
@@ -94,120 +98,99 @@ export default function TabTwo() {
         return;
       }
 
-      // database()
-      //   .ref("/posts")
-      //   .push()
-      //   .set(formData)
-      //   .then(() => {
-      //     Alert.alert("Success", "Your squirrel was posted!");
-      //     setFormData({ location: "", date: "", name: "", description: "" });
-      //   })
-      //   .catch((error: Error) => {
-      //     console.error(error);
-      //     Alert.alert("Error", "Failed to post :(");
-      //   });
+      // Here you would typically write the data to your backend or Firebase.
+      Alert.alert("Success", "Your squirrel was posted!");
+      setFormData({ location: "", date: "", name: "", description: "" });
     };
 
     return (
-      <View style={styles.post}>
+      <ScrollView contentContainerStyle={styles.formContainer}>
         <PhotoLibraryPicker />
-
-        <View style={styles.textInput}>
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Location: </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter location"
-              value={formData.location}
-              onChangeText={(val) => handleChange("location", val)}
-            />
-          </View>
-
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Date: </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter date"
-              value={formData.date}
-              onChangeText={(val) => handleChange("date", val)}
-            />
-          </View>
-
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Squirrel's Name </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter the squirrel's name"
-              value={formData.name}
-              onChangeText={(val) => handleChange("name", val)}
-            />
-          </View>
-
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Description </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter description"
-              value={formData.description}
-              onChangeText={(val) => handleChange("description", val)}
-            />
-          </View>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>Location: </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter location"
+            value={formData.location}
+            onChangeText={(val) => handleChange("location", val)}
+          />
         </View>
-
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>Date: </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter date"
+            value={formData.date}
+            onChangeText={(val) => handleChange("date", val)}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>Squirrel's Name: </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter the squirrel's name"
+            value={formData.name}
+            onChangeText={(val) => handleChange("name", val)}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>Description: </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter description"
+            value={formData.description}
+            onChangeText={(val) => handleChange("description", val)}
+          />
+        </View>
         <Button title="Post" onPress={handleSubmit} />
-      </View>
+      </ScrollView>
     );
   };
+
+  // Return the Form component so that something is displayed in the "Post" tab.
+  return <Form />;
 }
 
-// Styles
 const styles = StyleSheet.create({
-  photoButton: {
-    textAlign: "center",
-    paddingTop: 20,
-    paddingBottom: 20,
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  post: {
-    flexDirection: "column",
-    marginTop: 15,
-    flex: 0.9,
+  formContainer: {
+    flexGrow: 1,
+    padding: 20,
+    alignItems: "center",
     justifyContent: "center",
   },
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  inputContainer: {
+    marginVertical: 10,
+  },
+  inputRow: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    marginRight: 5,
+    color: "#333",
   },
   input: {
-    color: "white",
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
-    width: 200,
-    marginTop: 10,
     paddingHorizontal: 10,
-  },
-  inputRow: {
-    alignSelf: "flex-start",
-    marginTop: 20,
-    marginLeft: 20,
-    flexDirection: "row", // Arrange items in a row
-    alignItems: "center", // Align text and input vertically
-    marginBottom: 10, // Add spacing
+    width: 200,
+    backgroundColor: "#fff",
   },
   image: {
     width: 300,
     height: 200,
     marginTop: 15,
-  },
-  label: {
-    fontSize: 17,
-    color: "white",
-    paddingTop: 10,
-  },
-  textInput: {
-    marginBottom: 30,
-    marginLeft: 15,
   },
 });
