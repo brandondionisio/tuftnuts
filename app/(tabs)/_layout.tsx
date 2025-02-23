@@ -3,6 +3,9 @@ import IonIcons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
+import SplashScreenComponent from "../../components/SplashScreen"
+import { useEffect, useState } from "react"
+import * as SplashScreen from "expo-splash-screen"
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof IonIcons>["name"];
@@ -13,6 +16,31 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  useEffect(() => {
+    async function prepareApp() {
+      try {
+        // Prevent Expo from hiding the splash screen automatically
+        await SplashScreen.preventAutoHideAsync();
+
+        // Simulate app loading (e.g., load fonts, fetch data)
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+
+        setIsAppReady(true);
+      } finally {
+        // Ensure Expo's splash screen never appears, only hide it when ready
+        await SplashScreen.hideAsync();
+      }
+    }
+
+    prepareApp();
+  }, []);
+
+  if (!isAppReady) {
+    return <SplashScreenComponent />; // Show only your custom splash screen
+  }
 
   return (
     <Tabs
